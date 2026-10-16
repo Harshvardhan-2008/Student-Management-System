@@ -1,0 +1,222 @@
+import json
+print("===== STUDENT MANAGEMENT SYSTEM =====")
+
+class Student:
+    def __init__(self,student_id,name,marks_list):
+        self.student_id =student_id
+        self.name=name
+        self.marks_list=marks_list
+        
+    def total_marks(self):
+        total=0
+        total =total+ self.marks_list[0]+ self.marks_list[1]+ self.marks_list[2]
+        return total
+        
+    def percentage(self):
+        
+        return (self.total_marks() / 300) * 100
+    
+    def grade(self):
+        per=self.percentage()
+        if per >= 90:
+            return "A+"
+        elif per >= 80:
+            return "A"
+        elif per >= 70:
+            return "B"
+        elif per >= 60:
+            return "C"
+        elif per >= 40:
+            return "D"
+        else:
+            return "Fail"
+        
+    
+    def to_dict(self):
+        return {
+            "student_id": self.student_id,
+            "name": self.name,
+            "marks_list": self.marks_list
+        }
+        
+    
+def save_students():
+    student_data = []   
+    for student in students:
+        student_data.append(student.to_dict())
+    
+    with open("students.json","w") as f:
+        json.dump(student_data,f,indent=4)
+    print("Student records saved successfully!")
+    
+
+def load_students():
+    students_data = []
+
+    try:
+        with open("students.json", "r") as f:
+            students_data = json.load(f)
+    except FileNotFoundError:
+        return []
+
+    loaded_students = []
+
+    for data in students_data:
+        student = Student(
+            data["student_id"],
+            data["name"],
+            data["marks_list"]
+        )
+        loaded_students.append(student)
+
+    return loaded_students
+
+students =load_students()
+while True:
+    
+    print('''
+    1. Add Student
+    2. View All Students
+    3. Search Student
+    4. Update Student Marks
+    5. Delete Student
+    6. Show Topper
+    7. Exit''')
+    
+    try:
+        choice = int(input("Enter your choice: "))
+    except ValueError:
+        print("Invalid input! Please enter a number.")
+        continue
+
+    
+    if choice ==1:
+        student_id =int(input("Enter Student ID: "))
+       
+        found =False
+        for student in students:
+            
+            if student_id ==student.student_id:
+                
+                found=True
+                break
+        if found:
+            print("Student ID already exists!")
+        else:
+            name = input("Enter Student Name: ")
+        
+       
+            marks_new = []
+
+            for i in range(3):
+                marks = int(input(f"Enter marks for subject {i+1}: "))
+                while marks>100 or marks<0:
+                
+                    print("Invalid marks! Enter marks between 0 and 100.")
+                    marks = int(input(f"Enter marks for subject {i+1}: "))
+                marks_new.append(marks)
+            student=Student(student_id,name,marks_new)
+            
+            students.append(student)
+         
+            save_students()
+            
+            print("Add Student selected!")
+            print(student.to_dict())
+        
+            print("Student added successfully!")
+        
+    
+        
+    elif choice ==2:
+        print('''===== ALL STUDENTS =====''')
+        
+        if len(students) ==0:
+            print("No students found!")
+        else:
+            for student in students:
+                print("ID:", student.student_id)
+                print("Name:", student.name)
+                print("Marks:", student.marks_list)
+                print("Total:", student.total_marks())
+                print(f"Percentage: {student.percentage():.2f}%")
+                print("Grade:", student.grade())
+                print("----------------------")
+                
+    elif choice ==3:
+        id_std=int(input("ID: "))
+        found=False
+        for student in students:
+          
+            if id_std ==student.student_id:
+                print("ID:", student.student_id)
+                print("Name:", student.name)
+                print("Marks:", student.marks_list)
+                print("Total:", student.total_marks())
+                print(f"Percentage: {student.percentage():.2f}%")
+                print("Grade:", student.grade())
+                found=True
+                break
+        if not found:
+            
+            print("Student not found!")
+            
+    elif choice ==4:
+        id_std=int(input("ID: "))
+        found =False
+        for student in students:
+            if id_std ==student.student_id:
+                found =True
+                marks_new =[]
+                
+                for i in range(3):
+                    marks = int(input(f"Enter marks for subject {i+1}: "))
+                    while marks>100 or marks<0:
+                                    
+                        print("Invalid marks! Enter marks between 0 and 100.")
+                        marks = int(input(f"Enter marks for subject {i+1}: "))
+                    marks_new.append(marks)
+                student.marks_list = marks_new
+                print("Marks updated successfully!")
+                save_students()
+                break
+        if not found:
+            print("Student not found!")
+            
+    elif choice ==5:
+        id_std=int(input("ID: "))
+        found =False
+        for student in students:
+            if id_std ==student.student_id:
+                found =True
+                students.remove(student)
+                print("Student deleted successfully!")
+                save_students()
+                break
+        if not found:
+            print("Student not found!")
+    
+    elif choice ==6:
+        print("===== CLASS TOPPER =====")
+       
+        if len(students) ==0:
+            print("No students found!")
+        else:
+            topper = max(students, key=lambda student: student.percentage())
+            print("ID:", topper.student_id)
+            print("Name:", topper.name)
+            print(f"Percentage: {topper.percentage():.2f}%")
+            print("Grade:", topper.grade())
+                 
+    elif choice ==7:
+        
+        print("Exiting program...")
+        save_students()
+        break
+    else:
+        print("Invalid choice!")
+        
+
+
+    
+
